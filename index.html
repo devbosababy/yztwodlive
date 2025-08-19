@@ -1,138 +1,51 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YZ 2DLive</title>
-<style>
-  /* သင့်ရဲ့ CSS styles အားလုံးကို ဒီနေရာမှာ ထည့်သွင်းပါ */
-  body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: #000;
-    color: #ffd700;
-  }
-  /* ကျန်တဲ့ CSS တွေကို သင့်မူရင်း အတိုင်းထားခဲ့ပါ */
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YZ 2DLive</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Header -->
+    <div id="header">YZ 2DLive</div>
+    
+    <!-- Menu Button -->
+    <button id="menuBtn">☰ မီနူး</button>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <h2>MM Menu</h2>
+        <a href="#" onclick="showPage('home')">🏠 မူလစာမျက်နှာ</a>
+        <a href="#" onclick="showPage('shop')">🍀လက်ကီးကံစမ်း</a>
+        <a href="#" onclick="showPage('member')">📝 အဖွဲ့ဝင်များသီးသန့်</a>
+        <a href="#" onclick="showPage('telegram')">📢 Telegramဂရုသို့</a>
+    </div>
 
-<!-- သင့်ရဲ့ HTML structure အားလုံး ဒီနေရာမှာ ထည့်ပါ -->
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Home Section -->
+        <div id="home" class="section active">
+            <!-- Marquee -->
+            <div class="marquee-wrapper">
+                <div class="marquee-text">မင်္ဂလာပါ။ မိတ်ဆွေများ တစ်နေရာထဲမှာ ထွက်ဂဏန်းများကြည့်နိုင်စေရန် ရည်ရွယ်ပြီးလုပ်ပေးထားပါတယ်</div>
+            </div>
 
-<script>
-// ====== Core Functions ======
-// Number Grid
-const grid = document.getElementById('numberGrid');
-for(let i=0;i<100;i++){
-  let n = i<10?'0'+i:i;
-  const btn = document.createElement('button');
-  btn.textContent = n;
-  btn.style.padding='12px';
-  btn.style.fontSize='1.1em';
-  btn.style.border='1px solid #555';
-  btn.style.cursor='pointer';
-  btn.style.background='#333';
-  btn.style.color='#FFD700';
-  btn.onclick = ()=> selectGridNumber(n);
-  grid.appendChild(btn);
-}
+            <!-- Live Data Display -->
+            <div class="live-data-container">
+                <div class="live-data-header" id="live-2d-value">--</div>
+                <div class="live-data-update" id="live-2d-update">Loading...</div>
+                <!-- ... (ကျန်တဲ့ HTML structure များ) ... -->
+            </div>
+        </div>
 
-let selectedNumber = null;
-let selectedAmount = null;
+        <!-- Other Sections -->
+        <div id="shop" class="section">
+            <!-- Shop content -->
+        </div>
+        <!-- ... (ကျန်တဲ့ sections များ) ... -->
+    </div>
 
-function selectGridNumber(num){
-  selectedNumber = num;
-  showSelectedInfo();
-}
-
-function setAmount(amt){
-  selectedAmount = amt;
-  showSelectedInfo();
-}
-
-function showSelectedInfo(){
-  const info = document.getElementById('selectedInfo');
-  if(selectedNumber && selectedAmount){
-    info.textContent = `ရွေးထားသော ဂဏန်း: ${selectedNumber}, ငွေပမာဏ: ${selectedAmount} ကျပ်`;
-    info.style.background = '#333';
-    info.style.color = '#FFD700';
-    info.style.border = '1px solid #FFD700';
-  }else if(selectedNumber){
-    info.textContent = `ရွေးထားသော ဂဏန်း: ${selectedNumber}, ငွေပမာဏ မရွေးသေးပါ။`;
-    info.style.background = '#222';
-    info.style.color = '#FFD700';
-    info.style.border = '1px solid #555';
-  }else{
-    info.textContent = 'ဂဏန်း/အရေအတွက် ရွေးပြီး မရွေးသေးပါ။';
-    info.style.background = '#222';
-    info.style.color = '#bbb';
-    info.style.border = '1px solid #555';
-  }
-}
-
-// ====== Google Sheets Integration ======
-const SHEET_ID = '1HRq3VzcG1q3-iG8kvVj9Ja-A3KHbTNsgAldgVje30Gk';
-const API_KEY = 'AIzaSyB3Y8yJyQnH5eXkXq7zQ9XJvZv8XxYyZzZ'; // သင့်ရဲ့ API Key နဲ့ အစားထိုးပါ
-
-async function saveOrder() {
-  if(!selectedNumber || !selectedAmount) {
-    alert("ဂဏန်းနှင့်ငွေပမာဏ ရွေးပါ");
-    return;
-  }
-
-  const phone = prompt("ဖုန်းနံပါတ်ထည့်ပါ:");
-  if(!phone || !/^(\+?95|0)[0-9]{9,10}$/.test(phone)) {
-    alert("ဖုန်းနံပါတ် မှားယွင်းနေပါသည်");
-    return;
-  }
-
-  const orderData = {
-    timestamp: new Date().toISOString(),
-    number: selectedNumber,
-    amount: selectedAmount,
-    phone: phone,
-    status: "pending"
-  };
-
-  try {
-    const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Orders!A1:append?valueInputOption=USER_ENTERED&key=${API_KEY}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        range: "Orders!A1",
-        majorDimension: "ROWS",
-        values: [Object.values(orderData)]
-      })
-    });
-
-    if(response.ok) {
-      alert("အော်ဒါတင်ပြီးပါပြီ!");
-    } else {
-      const errorData = await response.json();
-      throw new Error(errorData.error.message);
-    }
-  } catch (error) {
-    console.error("Error:", error);
-    alert(`အမှားတစ်ခုဖြစ်နေပါသည်: ${error.message}`);
-  }
-}
-
-// ====== Initialization ======
-document.addEventListener('DOMContentLoaded', () => {
-  // Add event listeners
-  document.getElementById('confirm-btn').addEventListener('click', saveOrder);
-  
-  // Telegram Mini App Integration
-  if (window.Telegram && window.Telegram.WebApp) {
-    const tgWebApp = window.Telegram.WebApp;
-    tgWebApp.expand();
-    tgWebApp.setBackgroundColor('#000000');
-    tgWebApp.setHeaderColor('#333333');
-    tgWebApp.enableClosingConfirmation();
-  }
-});
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
