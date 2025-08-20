@@ -1,51 +1,558 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YZ 2DLive</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YZ All In One 2DLive</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+  background: #000;
+  color: #ffd700;
+}
+
+/* Header */
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: linear-gradient(135deg, #333 0%, #111 100%);
+  line-height: 60px;
+  text-align: center;
+  font-weight: bold;
+  z-index: 1002;
+  font-size: 2.5em;
+  text-shadow: 2px 2px 0 #DAA520, 4px 4px 0 #B8860B, 6px 6px 0 #A0522D, 8px 8px 0 #8B4513, 10px 10px 0 #5C320A;
+  letter-spacing: 2px;
+}
+
+/* Sidebar with toggle functionality */
+.sidebar {
+  width: 220px;
+  background: linear-gradient(to bottom, #222, #111);
+  color: #fff;
+  height: 100vh;
+  padding-top: 20px;
+  position: fixed;
+  top: 0;
+  left: -220px; /* Initially hidden */
+  opacity: 1;
+  z-index: 1001;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.5);
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  transition: left 0.3s ease-in-out; /* Smooth slide transition */
+}
+.sidebar.active {
+  left: 0; /* Show sidebar when active */
+}
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.4rem;
+  color: #ffd700;
+  text-shadow: 1px 1px 4px #000;
+}
+.sidebar a {
+  display: block;
+  padding: 12px 20px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  margin: 5px 10px;
+  border-radius: 8px;
+  transition: background 0.3s, transform 0.2s, color 0.3s;
+}
+.sidebar a:hover {
+  background: linear-gradient(90deg, #ffd700, #daa520);
+  color: #000;
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Toggle Button */
+.toggle-btn {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: #ffd700;
+  color: #000;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  z-index: 1003;
+  transition: background-color 0.3s ease;
+}
+.toggle-btn:hover {
+  background-color: #ffea00;
+}
+
+/* Content */
+.content {
+  margin-left: 0; /* Adjusted to account for hidden sidebar */
+  padding: 20px;
+  margin-top: 60px; /* Adjusted to clear the fixed header */
+  transition: margin-left 0.3s ease-in-out; /* Smooth content shift */
+}
+.content.shifted {
+  margin-left: 220px; /* Shift content when sidebar is visible */
+}
+.section {
+  display: none;
+}
+.section.active {
+  display: block;
+}
+h2 {
+  text-align: center;
+  margin: 20px 0;
+  color: #f4f4f4;
+}
+
+/* Marquee */
+.marquee-wrapper {
+  width: 100%;
+  background: #111;
+  border-bottom: 2px solid #ffd700;
+  overflow: hidden;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px #ffd700aa;
+  margin: 20px 0;
+}
+.marquee-text {
+  display: inline-block;
+  padding: 12px 0;
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-shadow: 0 0 6px #ffd700, 0 0 18px #ffd700bb;
+  animation: marquee 10s linear infinite;
+}
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Panels */
+.panel {
+  margin: 20px auto;
+  max-width: 760px;
+  border-radius: 12px;
+  background: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+.panel .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  font-weight: bold;
+  font-size: 1.2em;
+  background: #282828;
+  color: #ffd700;
+}
+.panel .badge {
+  font-weight: bold;
+}
+.panel .live-label {
+  color: #28a745;
+  font-weight: bold;
+}
+.panel .content {
+  padding: 20px;
+  text-align: center;
+  color: #f4f4f4;
+}
+.panel h2 {
+  font-size: 2em;
+  text-shadow: 0 0 6px #ffd700, 0 0 18px #ffd700bb;
+}
+.panel iframe {
+  width: 100%;
+  height: 300px;
+  border: none;
+  display: block;
+}
+.panel .note {
+  padding: 10px 15px;
+  font-size: 0.9em;
+  color: #bbb;
+}
+
+/* Announcement Slider - buttons only */
+.announcement-container {
+  position: relative;
+  max-width: 760px;
+  width: 100%;
+  height: 300px;
+  margin: 20px auto 30px;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 0 15px #ffd700aa;
+  border: 2px solid #ffd700;
+}
+.announcement-slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease, transform 0.8s ease;
+  transform: translateX(100%);
+}
+.announcement-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures images cover the area without distortion */
+}
+.announcement-slide.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+.announcement-controls {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  z-index: 10;
+  transform: translateY(-50%);
+  padding: 0 10px; /* Add some padding to controls */
+}
+.announcement-controls button {
+  background: rgba(0,0,0,0.6);
+  border: 1px solid #ffd700;
+  color: #ffd700;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.announcement-controls button:hover {
+  background: #ffd700;
+  color: #000;
+}
+
+/* Telegram Box */
+.telegram-box {
+  margin: 20px auto;
+  max-width: 760px;
+  padding: 10px;
+  background: #333;
+  border-left: 5px solid #FFD700;
+  font-size: 0.95em;
+  color: #f4f4f4;
+}
+.telegram-box a {
+  color: #FFD700;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Contact Buttons */
+.contact-btn {
+  background-color: #ffd700;
+  color: #000;
+  font-weight: 700;
+  border: none;
+  padding: 14px 30px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 0 15px #ffd700aa;
+  transition: background-color 0.3s ease;
+  margin: 10px 5px;
+}
+.contact-btn:hover {
+  background-color: #ffea00;
+}
+
+/* Shop Section */
+#shop h2 {
+  color: #FFD700;
+}
+#shop input[type="text"] {
+  background-color: #333;
+  color: #f4f4f4;
+  border: 1px solid #555;
+  border-radius: 5px;
+  padding: 8px 12px; /* Added padding for better input field */
+  width: calc(100% - 130px); /* Adjust width to fit button */
+  max-width: 300px;
+  margin-right: 10px;
+}
+#shop button {
+  background-color: #FFD700;
+  color: #333;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+#shop button:hover {
+  background-color: #DAA520;
+}
+#shop #numberGrid button {
+  background-color: #333;
+  color: #FFD700;
+  border: 1px solid #555;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 40px; /* Make buttons square */
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em; /* Ensure number is visible */
+}
+#shop #numberGrid button:hover {
+  background-color: #555;
+}
+#shop #selectedInfo {
+  background: #282828;
+  color: #f4f4f4;
+  border: 1px solid #FFD700;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 20px;
+}
+</style>
 </head>
 <body>
-    <!-- Header -->
-    <div id="header">YZ 2DLive</div>
-    
-    <!-- Menu Button -->
-    <button id="menuBtn">☰ မီနူး</button>
-    
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <h2>MM Menu</h2>
-        <a href="#" onclick="showPage('home')">🏠 မူလစာမျက်နှာ</a>
-        <a href="#" onclick="showPage('shop')">🍀လက်ကီးကံစမ်း</a>
-        <a href="#" onclick="showPage('member')">📝 အဖွဲ့ဝင်များသီးသန့်</a>
-        <a href="#" onclick="showPage('telegram')">📢 Telegramဂရုသို့</a>
+
+<div id="header">🇾 🇿 🇱 🇮 🇻 🇪</div>
+
+<!-- Toggle Button for Sidebar -->
+<button class="toggle-btn" id="toggleSidebar">☰</button>
+
+<div class="sidebar" id="sidebar">
+  <h2>MM Menu</h2>
+  <a href="#" onclick="showPage('home')">🏠 မူလစာမျက်နှာ</a>
+  <a href="#" onclick="showPage('shop')">🍀 လက်ကီးကံစမ်း</a>
+  <a href="#" onclick="showPage('member')">📝 အဖွဲ့ဝင်များ</a>
+  <a href="#" onclick="showPage('telegram')">📢 Telegram</a>
+</div>
+
+<div class="content">
+  <div id="home" class="section active">
+    <div class="marquee-wrapper">
+      <div class="marquee-text">မင်္ဂလာပါ။ မိတ်ဆွေများ တစ်နေရာထဲမှာ ထွက်ဂဏန်းများကြည့်နိုင်စေရန်ဖန်တီးထားပါတယ်။</div>
     </div>
 
-    <!-- Main Content -->
-    <div class="content">
-        <!-- Home Section -->
-        <div id="home" class="section active">
-            <!-- Marquee -->
-            <div class="marquee-wrapper">
-                <div class="marquee-text">မင်္ဂလာပါ။ မိတ်ဆွေများ တစ်နေရာထဲမှာ ထွက်ဂဏန်းများကြည့်နိုင်စေရန် ရည်ရွယ်ပြီးလုပ်ပေးထားပါတယ်</div>
-            </div>
-
-            <!-- Live Data Display -->
-            <div class="live-data-container">
-                <div class="live-data-header" id="live-2d-value">--</div>
-                <div class="live-data-update" id="live-2d-update">Loading...</div>
-                <!-- ... (ကျန်တဲ့ HTML structure များ) ... -->
-            </div>
-        </div>
-
-        <!-- Other Sections -->
-        <div id="shop" class="section">
-            <!-- Shop content -->
-        </div>
-        <!-- ... (ကျန်တဲ့ sections များ) ... -->
+    <!-- Announcement Slider -->
+    <div class="announcement-container">
+      <div class="announcement-slide active"><img src="https://i.ibb.co/4RkQxkYs/IMG-20250817-121808-777.jpg" alt="Announcement 1"/></div>
+      <div class="announcement-slide"><img src="https://i.ibb.co/v4Sf5WVJ/IMG-20250817-121130-748.jpg" alt="Announcement 2"/></div>
+      <div class="announcement-slide"><img src="https://i.ibb.co/gLf0JMHv/MI-20082025-0153.png" alt="Announcement 3"/></div>
+      <div class="announcement-controls">
+        <button id="prevAnnouncement">❮</button>
+        <button id="nextAnnouncement">❯</button>
+      </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- MM2D -->
+    <section class="panel" id="mm2d">
+      <div class="head"><span class="badge">ᴹᴹ²ᴰ</span><span class="live-label">LIVE</span></div>
+      <div class="content">
+        <h2 id="mm2d-twod">--</h2>
+        <small id="mm2d-time">Loading…</small>
+      </div>
+    </section>
+
+    <!-- Laos2D -->
+    <section class="panel" id="laos2d">
+      <div class="head"><span class="badge">ˡᵃᵒˢ²ᴰ</span><span class="live-label">LIVE</span></div>
+      <iframe src="https://laos2d.com" title="Laos 2D Live"></iframe>
+    </section>
+
+    <!-- Global2D -->
+    <section class="panel" id="global2d">
+      <div class="head"><span class="badge">ᴳˡᵒᵇᵃˡ²ᴰ</span><span class="live-label">LIVE</span></div>
+      <iframe src="https://global2d.live" title="Global 2D Live"></iframe>
+    </section>
+
+    <!-- Maxi2D -->
+    <section class="panel" id="maxi2d">
+      <div class="head"><span class="badge">ᴹᵃˣⁱ²ᴰ</span><span class="live-label">LIVE</span></div>
+      <iframe src="https://maxi2d.com" title="Maxi 2D Live"></iframe>
+      <div class="note">စတင်တည်ဆောက်ဆဲမို့လိုအပ်ချက်များအတွက်သည်းခံပေးပါ။ ကျေးဇူးတင်ပါသည်။</div>
+    </section>
+
+    <!-- Telegram Box & Contact Buttons -->
+    <div class="telegram-box">
+      မင်မင်တို့ရဲ့ Channel : <a href="https://t.me/yz2channel" target="_blank">ဝင်လည်သွားကြပါအုံး</a>
+    </div>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+  <!-- Channel and Group Buttons Row -->
+  <div style="display: flex; gap: 10px;">
+    <button class="contact-btn" onclick="window.location.href='https://t.me/yz2channel'">YZ Channel</button>
+    <button class="contact-btn" onclick="window.location.href='https://t.me/+5K3kYyAKvpxlNmVl'">YZ လက်ကီး ဂရု</button>
+  </div>
+
+  <!-- Admin Buttons Row -->
+  <div style="display: flex; gap: 10px;">
+    <button class="contact-btn" onclick="window.location.href='https://t.me/Caspian934'">Admin Caspian</button>
+    <button class="contact-btn" onclick="window.location.href='https://t.me/emilyvale'">Admin Emily</button>
+  </div>
+</div>
+
+  <!-- Shop Section -->
+  <div id="shop" class="section">
+    <h2>🍀 လက်ကီးကံစမ်း</h2>
+    <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 15px;">
+        <input type="text" placeholder="ဂဏန်းထည့်ရန်" id="lotteryInput">
+        <button onclick="addNumber()">ထည့်မည်</button>
+    </div>
+    <div id="numberGrid" style="margin-top:15px; display:flex; flex-wrap:wrap; gap:10px; justify-content: center;"></div>
+    <div id="selectedInfo" style="margin: 0 auto; max-width: 760px;">ရွေးထားသောဂဏန်းများ: မရှိသေးပါ။</div>
+  </div>
+
+  <!-- Member Section -->
+  <div id="member" class="section">
+    <h2>📝 အဖွဲ့ဝင်များ</h2>
+    <p style="text-align: center;">အဖွဲ့ဝင်စာရင်းများကို ယခုနေရာတွင်ပြထားမည်…</p>
+  </div>
+
+  <!-- Telegram Section -->
+  <div id="telegram" class="section">
+    <h2>📢 Telegram Updates</h2>
+    <p style="text-align: center;">အသစ်ဆုံးပေါ်သတင်းများကို Telegram မှာကြည့်ပါ။</p>
+    <div style="text-align: center;">
+      <a href="https://t.me/yz2channel" target="_blank" style="color:#FFD700;font-weight:bold;">➡ Channel Link</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// Page switch function to handle navigation
+function showPage(id) {
+  // Hide all sections first
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  // Show the selected section
+  document.getElementById(id).classList.add('active');
+  // Scroll to the top of the content area for a smoother experience
+  document.querySelector('.content').scrollTop = 0;
+}
+
+// Sidebar toggle functionality
+const toggleBtn = document.getElementById('toggleSidebar');
+const sidebar = document.getElementById('sidebar');
+const content = document.querySelector('.content');
+
+toggleBtn.addEventListener('click', () => {
+  sidebar.classList.toggle('active');
+  content.classList.toggle('shifted');
+});
+
+// Announcement slider functionality
+let currentSlide = 0;
+const slides = document.querySelectorAll('.announcement-slide');
+const prevBtn = document.getElementById('prevAnnouncement');
+const nextBtn = document.getElementById('nextAnnouncement');
+
+function showSlide(index) {
+  // Calculate the correct index to loop through slides
+  if (index < 0) {
+    index = slides.length - 1;
+  } else if (index >= slides.length) {
+    index = 0;
+  }
+
+  // Remove active class from all slides
+  slides.forEach(s => s.classList.remove('active'));
+  // Add active class to the current slide
+  slides[index].classList.add('active');
+  currentSlide = index;
+}
+
+// Event listeners for slider navigation buttons
+prevBtn.addEventListener('click', () => showSlide(currentSlide - 1));
+nextBtn.addEventListener('click', () => showSlide(currentSlide + 1));
+
+// Automatic slide change for announcement slider
+let slideInterval = setInterval(() => showSlide(currentSlide + 1), 5000); // Change slide every 5 seconds
+
+// Pause slider on hover, resume on mouse out
+const announcementContainer = document.querySelector('.announcement-container');
+if (announcementContainer) {
+    announcementContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
+    announcementContainer.addEventListener('mouseleave', () => {
+        slideInterval = setInterval(() => showSlide(currentSlide + 1), 5000);
+    });
+}
+
+// MM2D dummy data update (simulated live data)
+function updateMM2D() {
+  const twoDNumber = Math.floor(Math.random() * 100).toString().padStart(2, '0'); // Ensures 2 digits (e.g., 05, 12)
+  document.getElementById('mm2d-twod').innerText = twoDNumber;
+  document.getElementById('mm2d-time').innerText = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+// Update immediately on load and then every 2 seconds
+updateMM2D();
+setInterval(updateMM2D, 2000);
+
+// Shop numbers functionality
+const lotteryInput = document.getElementById('lotteryInput');
+const numberGrid = document.getElementById('numberGrid');
+const selectedInfo = document.getElementById('selectedInfo');
+let selectedNumbers = [];
+
+// Function to add a number to the selection
+function addNumber() {
+  const val = lotteryInput.value.trim();
+  // Validate input: must be 2 digits and not already selected
+  if (val.length === 2 && !isNaN(val) && !selectedNumbers.includes(val)) {
+    selectedNumbers.push(val);
+    renderNumbers();
+  } else if (val.length !== 2 || isNaN(val)) {
+    alert("ကျေးဇူးပြု၍ ဂဏန်း ၂ လုံးတိတိသာ ထည့်သွင်းပေးပါ။");
+  } else if (selectedNumbers.includes(val)) {
+    alert("ဒီဂဏန်းကို ရွေးပြီးသားပါ။ တခြားဂဏန်းရွေးပါ။");
+  }
+  lotteryInput.value = ''; // Clear input field
+}
+
+// Function to render selected numbers as clickable buttons
+function renderNumbers() {
+  numberGrid.innerHTML = ''; // Clear existing buttons
+  if (selectedNumbers.length === 0) {
+    selectedInfo.innerText = 'ရွေးထားသောဂဏန်းများ: မရှိသေးပါ။';
+    return;
+  }
+
+  selectedNumbers.forEach(n => {
+    const btn = document.createElement('button');
+    btn.textContent = n;
+    // Add click listener to remove the number when clicked
+    btn.onclick = () => {
+      selectedNumbers = selectedNumbers.filter(x => x !== n);
+      renderNumbers(); // Re-render after removal
+    };
+    numberGrid.appendChild(btn);
+  });
+  selectedInfo.innerText = 'ရွေးထားသောဂဏန်းများ: ' + selectedNumbers.join(', ');
+}
+
+// Initial render for shop numbers (in case of pre-selected numbers or empty state)
+document.addEventListener('DOMContentLoaded', renderNumbers);
+
+// Ensure the default page is shown on load
+document.addEventListener('DOMContentLoaded', () => showPage('home'));
+
+</script>
+
 </body>
 </html>
